@@ -1,15 +1,13 @@
 # X-SCRAPER-backend
-
-A powerful Node.js tool designed for scraping the latest assets from the [x.com](https://x.com/) platform. Track platform flags and monitor changes across multiple release platforms with ease.
+A powerful Node.js tool designed for scraping the latest assets from the web version of the [x.com](https://x.com/) platform that tracks platform flags and monitor changes across multiple release platforms with ease.
 
 ## Features
 - Scrape and download the latest assets from x.com.
-- Track platform flags across multiple releases.
-- Easy-to-use and highly customizable.
+- Track platform flags across multiple releases (Web, Android, iOS / Stable, Beta, Alpha).
 
 ## Requirements
-- Node.js (v14 or higher)
-- npm (v6 or higher)
+- Node.js (23.6.0)
+- npm (10.9.2)
 
 ## Installation
 1. Clone the repository:
@@ -28,7 +26,7 @@ A powerful Node.js tool designed for scraping the latest assets from the [x.com]
 ## Usage
 Run the tool with the following command:
 ```bash
-node index.js
+node run build && node run start
 ```
 
 ## Contributing
