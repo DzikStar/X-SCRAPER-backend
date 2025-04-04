@@ -1,0 +1,9 @@
+## Node.js Trashes
+/node_modules
+
+## Development Leftovers
+/.todo
+/dist
+
+## X-SCRAPER Generated Content
+/xscraper
