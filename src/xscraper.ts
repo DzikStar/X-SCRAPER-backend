@@ -20,7 +20,7 @@ export default class Xscraper {
         const git = new Github();
 
         git.clone(xscraperConfig['github']['output_repo']);
-        git.commit("🖥️ Web Update", 'X-SCRAPER')
+        git.commit('🖥️ Web Update', 'X-SCRAPER');
 
         clearPath('./X-SCRAPER-new');
     }

@@ -11,7 +11,7 @@ export class Github {
         const cnfg = loadConfig();
 
         this.PAT = process.env.GH_PERSONAL_ACCESS_TOKEN || '';
-        this.outputRepo = cnfg['github']['output_repo'];    
+        this.outputRepo = cnfg['github']['output_repo'];
         this.username = cnfg['github']['writer_username'];
         this.usermail = cnfg['github']['writer_usermail'];
     }
@@ -31,15 +31,15 @@ export class Github {
     }
 
     commit(message: string, path: string): void {
-        execSync(`git config --global user.name "${this.username}"`);
-        execSync(`git config --global user.email "${this.usermail}"`);
+        execSync(`git config user.name "${this.username}"`, { cwd: path });
+        execSync(`git config user.email "${this.usermail}"`, { cwd: path });
 
         execSync(`git remote set-url origin https://x-access-token:${this.PAT}@github.com/${this.outputRepo}.git`, { cwd: path });
 
         execSync('git add .', { cwd: path });
         execSync(`git commit --allow-empty -m "${message}"`, { cwd: path });
         execSync('git push origin main', { cwd: path });
-        
+
         console.log('Changes pushed successfully');
     }
 }
