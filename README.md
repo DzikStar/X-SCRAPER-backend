@@ -8,6 +8,7 @@ A powerful Node.js tool designed for scraping the latest assets from the web ver
 ## Requirements
 - Node.js (23.6.0)
 - npm (10.9.2)
+- git
 
 ## Installation
 1. Clone the repository:
@@ -24,16 +25,16 @@ A powerful Node.js tool designed for scraping the latest assets from the web ver
     ```
 
 ## Usage
-1. Configure xscraper.config.json.
+1. Configure `xscraper.config.json` file.
 2. Rename `.env.example` to `.env` and setup all required elements.
 3. Build X-SCRAPER tool
-```bash
-node run build
-```
+    ```bash
+    node run build
+    ```
 4. Run X-SCRAPER
-```bash
-node run start
-```
+    ```bash
+    node run start
+    ```
 
 ## Contributing
 Contributions are welcome! Feel free to fork the repository and submit a pull request.
