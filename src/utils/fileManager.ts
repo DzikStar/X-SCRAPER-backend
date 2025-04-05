@@ -1,5 +1,6 @@
 import * as fs from 'node:fs/promises';
 import * as path from 'path';
+import { readFileSync } from 'node:fs';
 
 export async function clearPath(targetPath: string): Promise<void> {
     try {
@@ -22,4 +23,8 @@ export async function saveFile(fileName: string, fileContent: string, filePath: 
     } catch (error) {
         console.error(`[ERROR] FILE NOT SAVED: ${error}`);
     }
+}
+
+export function loadConfig() {
+    return JSON.parse(readFileSync(path.join(process.cwd(), 'xscraper.config.json'), 'utf8'));
 }

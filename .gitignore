@@ -6,4 +6,10 @@
 /dist
 
 ## X-SCRAPER Generated Content
-/xscraper
+/X-SCRAPER-new
+
+## Cloned Repositories
+/X-SCRAPER
+
+## Launch Locally
+.env

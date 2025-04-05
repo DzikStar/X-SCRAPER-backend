@@ -23,13 +23,5 @@ jobs:
 
       - name: Run scraper
         run: npm run start
-
-      - name: Commit changes
-        run: |
-          git config --global user.name "GitHub Actions"
-          git config --global user.email "actions@github.com"
-          git add ./xscraper/
-          git diff --quiet && git diff --staged --quiet || git commit -m "🖥️ Web Update"
-          git push
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_PERSONAL_ACCESS_TOKEN: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
