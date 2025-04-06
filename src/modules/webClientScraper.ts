@@ -1,19 +1,14 @@
 import { Github } from './github.js';
+import { config } from '../core/config.js';
 import { getAsset } from '../utils/downloadManager.js';
-import { loadConfig, clearPath } from '../utils/fileManager.js';
+import { clearPath } from '../utils/fileManager.js';
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
 
 export class WebClientScraper {
-    private config: { github: { output_repo: string } };
-
-    constructor() {
-        this.config = loadConfig();
-    }
-
     async start() {
         await this.downloadAssets();
-        await this.manageRepository(this.config);
+        await this.manageRepository();
         clearPath('./X-SCRAPER-new');
     }
 
@@ -26,7 +21,7 @@ export class WebClientScraper {
         }
     }
 
-    async manageRepository(config: { github: { output_repo: string } }) {
+    async manageRepository() {
         const git = new Github();
         git.clone(config.github.output_repo);
         git.commit('🖥️ Web Update', 'X-SCRAPER');

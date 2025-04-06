@@ -1,19 +1,11 @@
 import { execSync } from 'node:child_process';
-import { loadConfig } from '../utils/fileManager.js';
+import { config } from '../core/config.js';
 
 export class Github {
     private PAT: string;
-    private outputRepo: string;
-    private username: string;
-    private usermail: string;
 
     constructor() {
-        const cnfg = loadConfig();
-
         this.PAT = process.env.GH_PERSONAL_ACCESS_TOKEN || '';
-        this.outputRepo = cnfg['github']['output_repo'];
-        this.username = cnfg['github']['writer_username'];
-        this.usermail = cnfg['github']['writer_usermail'];
     }
 
     private setRemote(PAT: string, outputRepo: string) {
@@ -31,10 +23,10 @@ export class Github {
     }
 
     commit(message: string, path: string): void {
-        execSync(`git config user.name "${this.username}"`, { cwd: path });
-        execSync(`git config user.email "${this.usermail}"`, { cwd: path });
+        execSync(`git config user.name "${config.github.writer_username}"`, { cwd: path });
+        execSync(`git config user.email "${config.github.writer_usermail}"`, { cwd: path });
 
-        execSync(`git remote set-url origin https://x-access-token:${this.PAT}@github.com/${this.outputRepo}.git`, { cwd: path });
+        execSync(`git remote set-url origin https://x-access-token:${this.PAT}@github.com/${config.github.output_repo}.git`, { cwd: path });
 
         execSync('git add .', { cwd: path });
         execSync(`git commit --allow-empty -m "${message}"`, { cwd: path });

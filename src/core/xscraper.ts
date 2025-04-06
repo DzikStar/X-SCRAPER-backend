@@ -1,7 +1,6 @@
 import { WebClientScraper } from '../modules/webClientScraper.js';
 
 export default class Xscraper {
-
     public scrapers: { [key: string]: { start: () => Promise<unknown> } };
 
     constructor() {
