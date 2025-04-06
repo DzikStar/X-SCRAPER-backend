@@ -1,8 +1,11 @@
 {
+    "process_path": "X-SCRAPER-new",
+    "repo_path": "X-SCRAPER",
     "deploy_output_on_github": true,
     "github": {
-        "input_repo": "DzikStar/X-SCRAPER-backend",
-        "output_repo": "DzikStar/X-SCRAPER",
+        "repos_owner": "DzikStar",
+        "input_repo": "X-SCRAPER-backend",
+        "output_repo": "X-SCRAPER",
         "writer_username": "GitHub Actions",
         "writer_usermail": "41898282+github-actions[bot]@users.noreply.github.com"
     }

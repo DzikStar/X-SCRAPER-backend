@@ -9,21 +9,21 @@ export class WebClientScraper {
     async start() {
         await this.downloadAssets();
         await this.manageRepository();
-        clearPath('./X-SCRAPER-new');
+        clearPath(`./${config.process_path}`);
     }
 
     async downloadAssets() {
-        await getAsset('index.html', undefined, './X-SCRAPER-new', 'html');
-        await getAsset('sw.js', 'sw.js', './X-SCRAPER-new', 'js');
+        await getAsset('index.html', undefined, `./${config.process_path}`, 'html');
+        await getAsset('sw.js', 'sw.js', `./${config.process_path}`, 'js');
 
-        if (!['index.html', 'sw.js'].every(file => existsSync(join('./X-SCRAPER-new', file)))) {
+        if (!['index.html', 'sw.js'].every(file => existsSync(join(`./${config.process_path}`, file)))) {
             process.exit();
         }
     }
 
     async manageRepository() {
         const git = new Github();
-        git.clone(config.github.output_repo);
-        git.commit('🖥️ Web Update', 'X-SCRAPER');
+        git.clone(`${config.github.repos_owner}/${config.github.output_repo}`);
+        git.commit('🖥️ Web Update', `${config.repo_path}`);
     }
 }

@@ -1,4 +1,5 @@
 import { saveFile } from './fileManager.js';
+import { config } from '../core/config.js';
 import prettier from 'prettier';
 
 export async function fetchFromURL(route?: string) {
@@ -16,7 +17,7 @@ export async function fetchFromURL(route?: string) {
     }
 }
 
-export async function getAsset(name: string, route?: string, savePath: string = './xscraper', formatting = 'text') {
+export async function getAsset(name: string, route?: string, savePath: string = `./${config.repo_path}`, formatting = 'text') {
     const response = await fetchFromURL(route);
 
     let content: string | undefined;
