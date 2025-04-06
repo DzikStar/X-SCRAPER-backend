@@ -2,7 +2,7 @@ import { Github } from './github.js';
 import { config } from '../core/config.js';
 import { getAsset } from '../utils/downloadManager.js';
 import { clearPath } from '../utils/fileManager.js';
-import { existsSync } from 'node:fs';
+import { existsSync, cpSync } from 'node:fs';
 import { join } from 'node:path';
 
 export class WebClientScraper {
@@ -24,6 +24,7 @@ export class WebClientScraper {
     async manageRepository() {
         const git = new Github();
         git.clone(`${config.github.repos_owner}/${config.github.output_repo}`);
+        cpSync(`./${config.process_path}`, `./${config.repo_path}`, { recursive: true, force: true });
         git.commit('🖥️ Web Update', `${config.repo_path}`);
     }
 }
