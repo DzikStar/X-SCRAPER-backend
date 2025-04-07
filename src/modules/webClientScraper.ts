@@ -24,7 +24,7 @@ export class WebClientScraper {
     async manageRepository() {
         const git = new Github();
         git.clone(`${config.github.repos_owner}/${config.github.output_repo}`);
-        cpSync(`./${config.process_path}`, `./${config.repo_path}`, { recursive: true, force: true });
-        git.commit('🖥️ Web Update', `${config.repo_path}`);
+        cpSync(`./${config.process_path}`, `./${config.github.output_repo}`, { recursive: true, force: true });
+        git.commit('🖥️ Web Update', `${config.github.output_repo}`);
     }
 }

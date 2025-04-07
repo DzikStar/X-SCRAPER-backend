@@ -17,7 +17,7 @@ export async function fetchFromURL(route?: string) {
     }
 }
 
-export async function getAsset(name: string, route?: string, savePath: string = `./${config.repo_path}`, formatting = 'text') {
+export async function getAsset(name: string, route?: string, savePath: string = `./${config.github.output_repo}`, formatting = 'text') {
     const response = await fetchFromURL(route);
 
     let content: string | undefined;
