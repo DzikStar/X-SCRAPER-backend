@@ -8,7 +8,8 @@ import { join } from 'node:path';
 export class WebClientScraper {
     async start() {
         await this.downloadAssets();
-        await this.manageRepository();
+        await this.deployChanges();
+
         clearPath(`./${config.process_path}`);
     }
 
@@ -21,10 +22,15 @@ export class WebClientScraper {
         }
     }
 
-    async manageRepository() {
+    async deployChanges() {
         const git = new Github();
+        
         git.clone(`${config.github.repos_owner}/${config.github.output_repo}`);
+
         cpSync(`./${config.process_path}`, `./${config.github.output_repo}`, { recursive: true, force: true });
-        git.commit('🖥️ Web Update', `${config.github.output_repo}`);
+
+        if (config.deploy_on_github) {
+            git.commit('🖥️ Web Update', `${config.github.output_repo}`);
+        }
     }
 }

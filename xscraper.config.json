@@ -1,6 +1,6 @@
 {
     "process_path": "X-SCRAPER-new",
-    "deploy_output_on_github": true,
+    "deploy_on_github": true,
     "github": {
         "repos_owner": "DzikStar",
         "input_repo": "X-SCRAPER-backend",
