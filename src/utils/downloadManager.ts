@@ -2,7 +2,7 @@ import { saveFile } from './fileManager.js';
 import { config } from '../core/config.js';
 import prettier from 'prettier';
 
-export async function fetchFromURL(route?: string) {
+export async function fetchFromURL(route?: string): Promise<Response | undefined> {
     try {
         return await fetch(`https://x.com/${route}`, {
             headers: {
@@ -17,7 +17,7 @@ export async function fetchFromURL(route?: string) {
     }
 }
 
-export async function getAsset(name: string, route?: string, savePath: string = `./${config.github.output_repo}`, formatting = 'text') {
+export async function getAsset(name: string, route?: string, savePath: string = `./${config.github.output_repo}`, formatting: 'text' | 'js' | 'html' = 'text'): Promise<void> {
     const response = await fetchFromURL(route);
 
     let content: string | undefined;
@@ -28,11 +28,11 @@ export async function getAsset(name: string, route?: string, savePath: string = 
         process.exit();
     }
 
-    let formattedContent;
+    let formattedContent: string | undefined;
 
     switch (formatting) {
         case 'js':
-            formattedContent = await prettier.format(await content, {
+            formattedContent = await prettier.format(content, {
                 parser: 'babel',
                 tabWidth: 4,
                 useTabs: false,
@@ -40,7 +40,7 @@ export async function getAsset(name: string, route?: string, savePath: string = 
             });
             break;
         case 'html':
-            formattedContent = await prettier.format(await content, {
+            formattedContent = await prettier.format(content, {
                 parser: 'html',
                 tabWidth: 4,
                 useTabs: false,

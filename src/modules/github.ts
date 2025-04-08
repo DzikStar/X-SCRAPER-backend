@@ -1,5 +1,8 @@
-import { execSync } from 'node:child_process';
+import { exec } from 'node:child_process';
 import { config } from '../core/config.js';
+import { promisify } from 'util';
+
+const execAsync = promisify(exec);
 
 export class Github {
     private PAT: string;
@@ -8,29 +11,29 @@ export class Github {
         this.PAT = process.env.GH_PERSONAL_ACCESS_TOKEN || '';
     }
 
-    private setRemote(PAT: string, outputRepo: string) {
-        execSync(`git remote set-url origin https://x-access-token:${PAT}@github.com/${outputRepo}.git`);
+    private async setRemote(PAT: string, outputRepo: string): Promise<void> {
+        await execAsync(`git remote set-url origin https://x-access-token:${PAT}@github.com/${outputRepo}.git`);
     }
 
-    private setUser(username: string, usermail: string): void {
-        execSync(`git config user.name "${username}"`);
-        execSync(`git config user.email "${usermail}"`);
+    private async setUser(username: string, usermail: string): Promise<void> {
+        await execAsync(`git config user.name "${username}"`);
+        await execAsync(`git config user.email "${usermail}"`);
     }
 
-    clone(repo: string): void {
-        execSync(`git clone https://github.com/${repo}.git`);
+    async clone(repo: string): Promise<void> {
+        await execAsync(`git clone https://github.com/${repo}.git`);
         console.info(`Cloned ${repo} repository.`);
     }
 
-    commit(message: string, path: string): void {
-        execSync(`git config user.name "${config.github.writer_username}"`, { cwd: path });
-        execSync(`git config user.email "${config.github.writer_usermail}"`, { cwd: path });
+    async commit(message: string, path: string): Promise<void> {
+        await execAsync(`git config user.name "${config.github.writer_username}"`, { cwd: path });
+        await execAsync(`git config user.email "${config.github.writer_usermail}"`, { cwd: path });
 
-        execSync(`git remote set-url origin https://x-access-token:${this.PAT}@github.com/${config.github.repos_owner}/${config.github.output_repo}.git`, { cwd: path });
+        await execAsync(`git remote set-url origin https://x-access-token:${this.PAT}@github.com/${config.github.repos_owner}/${config.github.output_repo}.git`, { cwd: path });
 
-        execSync('git add .', { cwd: path });
-        execSync(`git commit --allow-empty -m "${message}"`, { cwd: path });
-        execSync('git push origin main', { cwd: path });
+        await execAsync('git add .', { cwd: path });
+        await execAsync(`git commit --allow-empty -m "${message}"`, { cwd: path });
+        await execAsync('git push origin main', { cwd: path });
 
         console.log('Changes pushed successfully');
     }

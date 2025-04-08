@@ -29,11 +29,11 @@ A powerful Node.js tool designed for scraping the latest assets from the web ver
 2. Rename `.env.example` to `.env` and setup all required elements.
 3. Build X-SCRAPER tool
     ```bash
-    npm run build
+    node run build
     ```
 4. Run X-SCRAPER
     ```bash
-    npm run start
+    node run start
     ```
 
 ## Contributing

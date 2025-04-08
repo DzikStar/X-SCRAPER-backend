@@ -1,0 +1,15 @@
+## Node.js Trashes
+/node_modules
+
+## Development Leftovers
+/.todo
+/dist
+
+## X-SCRAPER Generated Content
+/X-SCRAPER-new
+
+## Cloned Repositories
+/X-SCRAPER
+
+## Launch Locally
+.env
