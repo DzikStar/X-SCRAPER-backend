@@ -17,7 +17,7 @@ export class WebClientScraper {
 
         await this.initRepo();
         cpSync(`./${config.process_path}`, `./${config.github.output_repo}`, { recursive: true, force: true });
-        await this.commitChanges()
+        await this.commitChanges();
 
         clearPath(`./${config.process_path}`);
     }
@@ -31,7 +31,7 @@ export class WebClientScraper {
         }
     }
 
-    async initRepo() {        
+    async initRepo() {
         this.git.clone(`${config.github.repos_owner}/${config.github.output_repo}`);
     }
 
