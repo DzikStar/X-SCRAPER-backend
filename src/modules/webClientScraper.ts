@@ -41,7 +41,7 @@ export class WebClientScraper {
                 } catch {
                     return false;
                 }
-            })
+            }),
         );
 
         if (!filesExist.every(exists => exists)) {
