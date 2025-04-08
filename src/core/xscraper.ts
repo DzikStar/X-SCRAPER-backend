@@ -21,7 +21,11 @@ export default class Xscraper {
 
             await scraper.start();
         } catch (error) {
-            console.error(`Error in run method: ${error.message}`);
+            if (error instanceof Error) {
+                console.error(`Error in run method: ${error.message}`);
+            } else {
+                console.error(`Error in run method: ${error}`);
+            }
         } finally {
             console.log(`Ending run method for scraper type: ${scraperType}`);
         }
