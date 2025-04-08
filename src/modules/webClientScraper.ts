@@ -6,9 +6,18 @@ import { existsSync, cpSync } from 'node:fs';
 import { join } from 'node:path';
 
 export class WebClientScraper {
+    private git: Github;
+
+    constructor() {
+        this.git = new Github();
+    }
+
     async start() {
         await this.downloadAssets();
-        await this.deployChanges();
+
+        await this.initRepo();
+        cpSync(`./${config.process_path}`, `./${config.github.output_repo}`, { recursive: true, force: true });
+        await this.commitChanges()
 
         clearPath(`./${config.process_path}`);
     }
@@ -22,15 +31,13 @@ export class WebClientScraper {
         }
     }
 
-    async deployChanges() {
-        const git = new Github();
-        
-        git.clone(`${config.github.repos_owner}/${config.github.output_repo}`);
+    async initRepo() {        
+        this.git.clone(`${config.github.repos_owner}/${config.github.output_repo}`);
+    }
 
-        cpSync(`./${config.process_path}`, `./${config.github.output_repo}`, { recursive: true, force: true });
-
+    async commitChanges() {
         if (config.deploy_on_github) {
-            git.commit('🖥️ Web Update', `${config.github.output_repo}`);
+            this.git.commit('🖥️ Web Update', config.github.output_repo);
         }
     }
 }
