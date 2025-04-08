@@ -49,7 +49,7 @@ export class Github {
             execSync(`git remote set-url origin https://x-access-token:${this.PAT}@github.com/${config.github.repos_owner}/${config.github.output_repo}.git`, { cwd: path });
 
             execSync('git add .', { cwd: path });
-            execSync(`git commit --allow-empty -m "${message}"`, { cwd: path });
+            execSync(`git commit -m "${message}"`, { cwd: path });
             execSync('git push origin main', { cwd: path });
 
             console.log('Changes pushed successfully');
