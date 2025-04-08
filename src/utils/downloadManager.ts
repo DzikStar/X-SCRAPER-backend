@@ -3,6 +3,7 @@ import { config } from '../core/config.js';
 import prettier from 'prettier';
 
 export async function fetchFromURL(route?: string) {
+    console.log('Starting fetchFromURL method');
     try {
         return await fetch(`https://x.com/${route}`, {
             headers: {
@@ -13,44 +14,53 @@ export async function fetchFromURL(route?: string) {
             },
         });
     } catch (error) {
-        console.warn(`[ERROR] fetchFromURL() \n ${error}`);
+        console.error(`[ERROR] fetchFromURL() \n ${error}`);
+    } finally {
+        console.log('Ending fetchFromURL method');
     }
 }
 
 export async function getAsset(name: string, route?: string, savePath: string = `./${config.github.output_repo}`, formatting = 'text') {
-    const response = await fetchFromURL(route);
+    console.log('Starting getAsset method');
+    try {
+        const response = await fetchFromURL(route);
 
-    let content: string | undefined;
+        let content: string | undefined;
 
-    if (response) {
-        content = await response.text();
-    } else {
-        process.exit();
+        if (response) {
+            content = await response.text();
+        } else {
+            process.exit();
+        }
+
+        let formattedContent;
+
+        switch (formatting) {
+            case 'js':
+                formattedContent = await prettier.format(await content, {
+                    parser: 'babel',
+                    tabWidth: 4,
+                    useTabs: false,
+                    printWidth: 2000,
+                });
+                break;
+            case 'html':
+                formattedContent = await prettier.format(await content, {
+                    parser: 'html',
+                    tabWidth: 4,
+                    useTabs: false,
+                    printWidth: 2000,
+                });
+                break;
+            case 'text':
+                formattedContent = content;
+                break;
+        }
+
+        await saveFile(name, formattedContent || '', savePath);
+    } catch (error) {
+        console.error(`[ERROR] getAsset() \n ${error}`);
+    } finally {
+        console.log('Ending getAsset method');
     }
-
-    let formattedContent;
-
-    switch (formatting) {
-        case 'js':
-            formattedContent = await prettier.format(await content, {
-                parser: 'babel',
-                tabWidth: 4,
-                useTabs: false,
-                printWidth: 2000,
-            });
-            break;
-        case 'html':
-            formattedContent = await prettier.format(await content, {
-                parser: 'html',
-                tabWidth: 4,
-                useTabs: false,
-                printWidth: 2000,
-            });
-            break;
-        case 'text':
-            formattedContent = content;
-            break;
-    }
-
-    await saveFile(name, formattedContent || '', savePath);
 }

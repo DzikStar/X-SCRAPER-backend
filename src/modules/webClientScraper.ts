@@ -2,7 +2,7 @@ import { Github } from './github.js';
 import { config } from '../core/config.js';
 import { getAsset } from '../utils/downloadManager.js';
 import { clearPath } from '../utils/fileManager.js';
-import { existsSync, cpSync } from 'node:fs';
+import { promises as fs } from 'node:fs';
 import { join } from 'node:path';
 
 export class WebClientScraper {
@@ -13,20 +13,38 @@ export class WebClientScraper {
     }
 
     async start() {
-        await this.downloadAssets();
+        console.log('Starting WebClientScraper start method');
+        try {
+            await this.downloadAssets();
 
-        await this.initRepo();
-        cpSync(`./${config.process_path}`, `./${config.github.output_repo}`, { recursive: true, force: true });
-        await this.commitChanges();
+            await this.initRepo();
+            await fs.cp(`./${config.process_path}`, `./${config.github.output_repo}`, { recursive: true, force: true });
+            await this.commitChanges();
 
-        clearPath(`./${config.process_path}`);
+            await clearPath(`./${config.process_path}`);
+        } catch (error) {
+            console.error('Error in WebClientScraper start method:', error);
+        } finally {
+            console.log('Ending WebClientScraper start method');
+        }
     }
 
     async downloadAssets() {
         await getAsset('index.html', undefined, `./${config.process_path}`, 'html');
         await getAsset('sw.js', 'sw.js', `./${config.process_path}`, 'js');
 
-        if (!['index.html', 'sw.js'].every(file => existsSync(join(`./${config.process_path}`, file)))) {
+        const filesExist = await Promise.all(
+            ['index.html', 'sw.js'].map(async file => {
+                try {
+                    await fs.access(join(`./${config.process_path}`, file));
+                    return true;
+                } catch {
+                    return false;
+                }
+            }),
+        );
+
+        if (!filesExist.every(exists => exists)) {
             process.exit();
         }
     }
