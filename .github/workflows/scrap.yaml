@@ -2,7 +2,7 @@ name: Launch X-SCRAPER
 
 on:
   workflow_dispatch:
-  shedule:
+  schedule:
     - cron: '*/10 * * * *'
 
 jobs:
