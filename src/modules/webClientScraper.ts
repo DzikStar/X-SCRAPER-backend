@@ -1,4 +1,5 @@
 import { Github } from './github.js';
+import { ContentResolver } from './contentResolver.js';
 import { config } from '../core/config.js';
 import { getAsset } from '../utils/downloadManager.js';
 import { clearPath } from '../utils/fileManager.js';
@@ -7,15 +8,18 @@ import { join } from 'node:path';
 
 export class WebClientScraper {
     private git: Github;
+    private resolver: ContentResolver;
 
     constructor() {
         this.git = new Github();
+        this.resolver = new ContentResolver();
     }
 
     async start() {
         console.log('Starting WebClientScraper start method');
         try {
             await this.downloadAssets();
+            await this.resolver.clearHTML();
 
             await this.initRepo();
             await fs.cp(`./${config.process_path}`, `./${config.github.output_repo}`, { recursive: true, force: true });
