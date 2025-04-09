@@ -8,7 +8,8 @@ export class ContentResolver {
     async clearHTML() {
         console.log('Starting removing index.html suppresion noise.');
 
-        let nonceCleared: number = 0;
+        let nonceCleared: number = 0,
+            verifCardCleaned: boolean = false;
 
         try {
             const indexHTML = await fs.readFile(`${config.process_path}/index.html`, 'utf-8');
@@ -19,7 +20,13 @@ export class ContentResolver {
                 nonceCleared++;
             });
 
-            console.log(`   [X-SCRAPER] Nonce cleared count: ${nonceCleared}`);
+            $('meta[name="twitter-site-verification"]').each((i, element) => {
+                $(element).attr('content', 'REPLACED_BY_X-SCRAPER');
+                verifCardCleaned = true;
+            });
+
+            console.info(`   [X-SCRAPER] Nonce cleared count: ${nonceCleared}`);
+            console.info(`   [X-SCRAPER] twitter-site-verification meta tag is cleared: ${verifCardCleaned}`);
 
             const content = prettier.format(await $.html(), {
                 parser: 'html',
