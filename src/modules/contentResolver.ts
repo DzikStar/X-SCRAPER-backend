@@ -9,7 +9,8 @@ export class ContentResolver {
         console.log('Starting removing index.html suppresion noise.');
 
         let nonceCleared: number = 0,
-            verifCardCleaned: boolean = false;
+            verifCardCleaned: boolean = false,
+            removedReactStyles: boolean = false;
 
         try {
             const indexHTML = await fs.readFile(`${config.process_path}/index.html`, 'utf-8');
@@ -25,8 +26,22 @@ export class ContentResolver {
                 verifCardCleaned = true;
             });
 
-            console.info(`   [X-SCRAPER] Nonce cleared count: ${nonceCleared}`);
-            console.info(`   [X-SCRAPER] twitter-site-verification meta tag is cleared: ${verifCardCleaned}`);
+            $('style#react-native-stylesheet').each((i, element) => {
+                const originalContent = $(element).html();
+
+                if (originalContent) {
+                    const cleaned = originalContent
+                        .replace(/\.r-vlxjld\b[^{]*\{[^}]+\}/g, '')
+                        .replace(/\.r-yfoy6g\b[^{]*\{[^}]+\}/g, '');
+                    
+                    $(element).html(cleaned);
+                    removedReactStyles = true;
+                }
+            })
+
+            console.info(`    [X-SCRAPER] Nonce cleared count: ${nonceCleared}`);
+            console.info(`    [X-SCRAPER] twitter-site-verification meta tag is cleared: ${verifCardCleaned}`);
+            console.info(`    [X-SCRAPER] react-native-stylesheet style classes cleared: ${removedReactStyles}`);
 
             let content = await prettier.format($.html(), {
                 parser: 'html',
