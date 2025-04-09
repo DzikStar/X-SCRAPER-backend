@@ -1,7 +1,9 @@
-name: Build & Scrap
+name: Launch X-SCRAPER
 
 on:
   workflow_dispatch:
+  shedule:
+    - cron: '*/10 * * * *'
 
 jobs:
   build-and-scrap:
@@ -9,6 +11,12 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+
+      - name: Show environment info
+        run: |
+          node -v
+          npm -v
+          git --version
 
       - name: Setup Node.js
         uses: actions/setup-node@v3
