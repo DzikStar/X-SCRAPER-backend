@@ -28,14 +28,19 @@ export class ContentResolver {
             console.info(`   [X-SCRAPER] Nonce cleared count: ${nonceCleared}`);
             console.info(`   [X-SCRAPER] twitter-site-verification meta tag is cleared: ${verifCardCleaned}`);
 
-            const content = prettier.format(await $.html(), {
+            let content = await prettier.format($.html(), {
                 parser: 'html',
                 tabWidth: 4,
                 useTabs: false,
                 printWidth: 2000,
             });
 
-            await saveFile('index.html', await content, config.process_path);
+            content = content.replace(RegExp('gt=...................'), 'gt=0000000000000000000');
+            content = content.replace(RegExp('guestId: ".................."'), 'guestId: "000000000000000000"');
+            content = content.replace(RegExp('serverDate: .............,'), 'serverDate: 0000000000000,');
+            content = content.replace(RegExp('userHash: "................................................................"'), 'userHash: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"');
+
+            await saveFile('index.html', content, config.process_path);
         } catch (error) {
             console.error('Error clearing index.html by clearHTML(): ', error);
         }
