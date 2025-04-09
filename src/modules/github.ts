@@ -41,21 +41,25 @@ export class Github {
     }
 
     commit(message: string, path: string): void {
-        console.log(`Committing changes to repository at path: ${path}`);
+        console.log(`Attempting to commit changes to repository at path: ${path}`);
         try {
             execSync(`git config user.name "${config.github.writer_username}"`, { cwd: path });
             execSync(`git config user.email "${config.github.writer_usermail}"`, { cwd: path });
-
+    
             execSync(`git remote set-url origin https://x-access-token:${this.PAT}@github.com/${config.github.repos_owner}/${config.github.output_repo}.git`, { cwd: path });
 
-            execSync('git add .', { cwd: path });
-            execSync(`git commit -m "${message}"`, { cwd: path });
-            execSync('git push origin main', { cwd: path });
+            if (!execSync('git status --porcelain', { cwd: path, encoding: 'utf-8' }).trim()) {
+                console.info(`No changes to commit at path: ${path}`);
+            } else {
+                execSync('git add .', { cwd: path });
+                execSync(`git commit -m "${message}"`, { cwd: path });
+                execSync('git push origin main', { cwd: path });
 
-            console.log('Changes pushed successfully');
+                console.info('Changes pushed successfully');
+            }
         } catch (error) {
             console.error('Error committing changes:', error);
         }
-        console.log(`Finished committing changes to repository at path: ${path}`);
+        console.log(`Finished attempt to commit changes to repository at path: ${path}`);
     }
 }
