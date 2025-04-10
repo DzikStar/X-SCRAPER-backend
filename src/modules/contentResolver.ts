@@ -30,14 +30,12 @@ export class ContentResolver {
                 const originalContent = $(element).html();
 
                 if (originalContent) {
-                    const cleaned = originalContent
-                        .replace(/\.r-vlxjld\b[^{]*\{[^}]+\}/g, '')
-                        .replace(/\.r-yfoy6g\b[^{]*\{[^}]+\}/g, '');
-                    
+                    const cleaned = originalContent.replace(/^\s*\.r-vlxjld\b[^{]*\{[^}]*\}\s*$\n?/gm, '').replace(/^\s*\.r-yfoy6g\b[^{]*\{[^}]*\}\s*$\n?/gm, '');
+
                     $(element).html(cleaned);
                     removedReactStyles = true;
                 }
-            })
+            });
 
             console.info(`    [X-SCRAPER] Nonce cleared count: ${nonceCleared}`);
             console.info(`    [X-SCRAPER] twitter-site-verification meta tag is cleared: ${verifCardCleaned}`);

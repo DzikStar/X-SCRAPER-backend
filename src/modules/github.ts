@@ -45,7 +45,7 @@ export class Github {
         try {
             execSync(`git config user.name "${config.github.writer_username}"`, { cwd: path });
             execSync(`git config user.email "${config.github.writer_usermail}"`, { cwd: path });
-    
+
             execSync(`git remote set-url origin https://x-access-token:${this.PAT}@github.com/${config.github.repos_owner}/${config.github.output_repo}.git`, { cwd: path });
 
             if (!execSync('git status --porcelain', { cwd: path, encoding: 'utf-8' }).trim()) {
