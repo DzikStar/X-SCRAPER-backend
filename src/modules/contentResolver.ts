@@ -2,7 +2,7 @@ import * as cheerio from 'cheerio';
 import * as prettier from 'prettier';
 import { promises as fs } from 'node:fs';
 import { saveFile } from '../utils/fileManager.js';
-import { getAsset } from 'utils/downloadManager.js';
+import { getAsset } from '../utils/downloadManager.js';
 import { config } from '../core/config.js';
 
 export class ContentResolver {
