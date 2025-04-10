@@ -1,15 +1,15 @@
 {
-    "domain": {
-        "twitter": "https://x.com",
-        "abs_twimg": "https://abs.twimg.com"
-    },
-    "process_path": "X-SCRAPER-new",
     "deploy_on_github": true,
+    "process_path": "X-SCRAPER-new",
     "github": {
         "repos_owner": "DzikStar",
         "input_repo": "X-SCRAPER-backend",
         "output_repo": "X-SCRAPER",
         "writer_username": "GitHub Actions",
         "writer_usermail": "41898282+github-actions[bot]@users.noreply.github.com"
+    },
+    "domain": {
+        "twitter": "https://x.com",
+        "abs_twimg": "https://abs.twimg.com"
     }
 }

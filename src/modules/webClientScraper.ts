@@ -20,6 +20,7 @@ export class WebClientScraper {
         try {
             await this.downloadAssets();
             await this.resolver.clearHTML();
+            await this.resolver.getServiceWorkerScripts();
 
             await this.initRepo();
             await fs.cp(`./${config.process_path}`, `./${config.github.output_repo}`, { recursive: true, force: true });

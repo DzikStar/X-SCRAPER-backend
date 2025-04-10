@@ -2,6 +2,7 @@ import * as cheerio from 'cheerio';
 import * as prettier from 'prettier';
 import { promises as fs } from 'node:fs';
 import { saveFile } from '../utils/fileManager.js';
+import { getAsset } from 'utils/downloadManager.js';
 import { config } from '../core/config.js';
 
 export class ContentResolver {
@@ -61,6 +62,22 @@ export class ContentResolver {
         console.log('Finished removing index.html supression noise.');
     }
 
+    async getServiceWorkerScripts() {
+        console.info('Started getServiceWorkerScripts method');
+        try {
+            const swFile = await fs.readFile(`${config.process_path}/sw.js`, 'utf-8');
+            const swURL = swFile.match(/importScripts\s*\(\s*(['"])(.*?)\1/);
+
+            if (swURL && swURL[2]) {
+                console.info(`    [X-SCRAPER] Service Worker detected: ${swURL[2]}`);
+                await getAsset(this.getFilename(swURL[2]), swURL[2], this.getPath(swURL[2]), 'js');
+            }
+        } catch (error) {
+            console.error('Errror in getServiceWorkerScripts method: ', error);
+        }
+        console.info('Finished getServiceWorkerScripts method');
+    }
+
     async getSHA() {
         console.info('Started getSHA method');
         try {
@@ -75,5 +92,23 @@ export class ContentResolver {
             console.error('Error in getSHA method: ', error);
         }
         console.info('Finished getSHA method');
+    }
+
+    private getPath(url: string): string {
+        if (!url.startsWith(`${config.domain.abs_twimg}/responsive-web`)) {
+            return url;
+        }
+
+        const replacedPath = url.replace(`${config.domain.abs_twimg}/responsive-web`, `./${config.process_path}`);
+        const pathSegments = replacedPath.split('/');
+
+        pathSegments.pop();
+
+        return pathSegments.join('/');
+    }
+
+    private getFilename(url: string): string {
+        const filenameWithSHA = url.substring(url.lastIndexOf('/') + 1);
+        return filenameWithSHA.replace(/^(.*)\.[a-f0-9]{8}(\.[^.]+)$/, '$1$2');
     }
 }
