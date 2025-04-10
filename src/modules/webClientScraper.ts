@@ -34,8 +34,8 @@ export class WebClientScraper {
     }
 
     async downloadAssets() {
-        await getAsset('index.html', 'https://x.com/', `./${config.process_path}`, 'html');
-        await getAsset('sw.js', 'https://x.com/sw.js', `./${config.process_path}`, 'js');
+        await getAsset('index.html', config.domain.twitter, `./${config.process_path}`, 'html');
+        await getAsset('sw.js', `${config.domain.abs_twimg}/sw.js`, `./${config.process_path}`, 'js');
 
         const filesExist = await Promise.all(
             ['index.html', 'sw.js'].map(async file => {
