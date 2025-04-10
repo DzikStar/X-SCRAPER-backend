@@ -2,10 +2,10 @@ import { saveFile } from './fileManager.js';
 import { config } from '../core/config.js';
 import prettier from 'prettier';
 
-export async function fetchFromURL(route?: string) {
+export async function fetchFromURL(url: string) {
     console.log('Starting fetchFromURL method');
     try {
-        return await fetch(`https://x.com/${route}`, {
+        return await fetch(url, {
             headers: {
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36',
                 Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
@@ -20,10 +20,10 @@ export async function fetchFromURL(route?: string) {
     }
 }
 
-export async function getAsset(name: string, route?: string, savePath: string = `./${config.github.output_repo}`, formatting = 'text') {
+export async function getAsset(name: string, url: string, savePath: string = `./${config.github.output_repo}`, formatting = 'text') {
     console.log('Starting getAsset method');
     try {
-        const response = await fetchFromURL(route);
+        const response = await fetchFromURL(url);
 
         let content: string | undefined;
 

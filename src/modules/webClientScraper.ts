@@ -34,8 +34,8 @@ export class WebClientScraper {
     }
 
     async downloadAssets() {
-        await getAsset('index.html', undefined, `./${config.process_path}`, 'html');
-        await getAsset('sw.js', 'sw.js', `./${config.process_path}`, 'js');
+        await getAsset('index.html', 'https://x.com/', `./${config.process_path}`, 'html');
+        await getAsset('sw.js', 'https://x.com/sw.js', `./${config.process_path}`, 'js');
 
         const filesExist = await Promise.all(
             ['index.html', 'sw.js'].map(async file => {
@@ -59,7 +59,7 @@ export class WebClientScraper {
 
     async commitChanges() {
         if (config.deploy_on_github) {
-            this.git.commit('🖥️ Web Update', config.github.output_repo);
+            this.git.commit(`🖥️ Web Update: ${(await this.resolver.getSHA())?.slice(0, 7)}`, config.github.output_repo);
         }
     }
 }

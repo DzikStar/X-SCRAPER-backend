@@ -60,4 +60,20 @@ export class ContentResolver {
 
         console.log('Finished removing index.html supression noise.');
     }
+
+    async getSHA() {
+        console.info('Started getSHA method');
+        try {
+            const swFile = await fs.readFile(`${config.process_path}/sw.js`, 'utf-8');
+            const SHA = swFile.match(/sha:\s*"([a-f0-9]{40})"/);
+
+            if (SHA) {
+                console.info(`    [X-SCRAPER] Release SHA: ${SHA[1]}`);
+                return SHA[1];
+            }
+        } catch (error) {
+            console.error('Error in getSHA method: ', error);
+        }
+        console.info('Finished getSHA method');
+    }
 }
