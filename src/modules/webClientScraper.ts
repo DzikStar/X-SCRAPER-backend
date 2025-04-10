@@ -33,7 +33,7 @@ export class WebClientScraper {
         }
     }
 
-    async downloadAssets() {
+    private async downloadAssets() {
         await getAsset('index.html', config.domain.twitter, `./${config.process_path}`, 'html');
         await getAsset('sw.js', `${config.domain.abs_twimg}/sw.js`, `./${config.process_path}`, 'js');
 
@@ -53,11 +53,11 @@ export class WebClientScraper {
         }
     }
 
-    async initRepo() {
+    private async initRepo() {
         this.git.clone(`${config.github.repos_owner}/${config.github.output_repo}`);
     }
 
-    async commitChanges() {
+    private async commitChanges() {
         if (config.deploy_on_github) {
             this.git.commit(`🖥️ Web Update: ${(await this.resolver.getSHA())?.slice(0, 7)}`, config.github.output_repo);
         }
