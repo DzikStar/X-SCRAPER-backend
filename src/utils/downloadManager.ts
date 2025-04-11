@@ -39,6 +39,7 @@ export async function getAsset(name: string, url: string, savePath: string = `./
             case 'js':
                 formattedContent = await prettier.format(await content, {
                     parser: 'babel',
+                    bracketSpacing: true,
                     tabWidth: 4,
                     useTabs: false,
                     printWidth: 2000,
