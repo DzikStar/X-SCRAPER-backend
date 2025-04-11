@@ -21,7 +21,7 @@ export class WebClientScraper {
             await this.downloadCommonAssets();
             await this.resolver.clearHTML();
 
-            await this.downloadPlatformAssets()
+            await this.downloadPlatformAssets();
 
             await this.initRepo();
             await fs.cp(`./${config.process_path}`, `./${config.github.output_repo}`, { recursive: true, force: true });

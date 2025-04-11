@@ -32,7 +32,7 @@ export class Github {
     clone(repo: string): void {
         console.log(`Cloning repository: ${repo}`);
         try {
-            execSync(`git clone https://github.com/${repo}.git`);
+            execSync(`git clone --depth 1 https://github.com/${repo}.git`);
             console.info(`Cloned ${repo} repository.`);
         } catch (error) {
             console.error(`Error cloning repository ${repo}:`, error);
