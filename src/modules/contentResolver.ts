@@ -78,6 +78,25 @@ export class ContentResolver {
         console.info('Finished getServiceWorkerScripts method');
     }
 
+    async getInitScripts() {
+        console.info('Starting getInitScripts method');
+        try {
+            const indexHTML = await fs.readFile(`${config.process_path}/index.html`, 'utf-8');
+            const $ = cheerio.load(indexHTML);
+
+            const elements = $('link[rel="preload"]').get();
+            for (const element of elements) {
+                const assetUrl = $(element).attr('href');
+                if (assetUrl) {
+                    await getAsset(this.getFilename(assetUrl), assetUrl, this.getPath(assetUrl), 'js');
+                }
+            }
+        } catch (error) {
+            console.info('Error on getInitScripts method', error);
+        }
+        console.info('Ending getInitScripts method');
+    }
+
     async getSHA() {
         console.info('Started getSHA method');
         try {

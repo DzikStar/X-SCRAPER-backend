@@ -18,9 +18,10 @@ export class WebClientScraper {
     async start() {
         console.log('Starting WebClientScraper start method');
         try {
-            await this.downloadAssets();
+            await this.downloadCommonAssets();
             await this.resolver.clearHTML();
-            await this.resolver.getServiceWorkerScripts();
+
+            await this.downloadPlatformAssets()
 
             await this.initRepo();
             await fs.cp(`./${config.process_path}`, `./${config.github.output_repo}`, { recursive: true, force: true });
@@ -34,7 +35,7 @@ export class WebClientScraper {
         }
     }
 
-    private async downloadAssets() {
+    private async downloadCommonAssets() {
         await getAsset('index.html', config.domain.twitter, `./${config.process_path}`, 'html');
         await getAsset('sw.js', `${config.domain.twitter}/sw.js`, `./${config.process_path}`, 'js');
 
@@ -52,6 +53,11 @@ export class WebClientScraper {
         if (!filesExist.every(exists => exists)) {
             process.exit();
         }
+    }
+
+    private async downloadPlatformAssets() {
+        await this.resolver.getServiceWorkerScripts();
+        await this.resolver.getInitScripts();
     }
 
     private async initRepo() {
