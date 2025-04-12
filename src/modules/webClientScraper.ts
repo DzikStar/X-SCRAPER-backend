@@ -66,7 +66,7 @@ export class WebClientScraper {
 
     private async commitChanges() {
         if (config.deploy_on_github) {
-            this.git.commit(`🖥️ Web Update: ${(await this.resolver.getSHA())?.slice(0, 7)}`, config.github.output_repo);
+            this.git.commit(`🖥️ WEB Build: ${(await this.resolver.getSHA())?.slice(0, 7)}`, config.github.output_repo);
         }
     }
 }
