@@ -1,7 +1,14 @@
 import { WebClientScraper } from '../modules/webClientScraper.js';
+import logger from '../utils/logger.js';
+
+export type ScraperType = 'web-client'; // Add more types as needed
+
+export interface Scraper {
+    start(): Promise<unknown>;
+}
 
 export default class Xscraper {
-    public scrapers: { [key: string]: { start: () => Promise<unknown> } };
+    private scrapers: Record<string, Scraper>;
 
     constructor() {
         this.scrapers = {
@@ -10,24 +17,31 @@ export default class Xscraper {
         };
     }
 
-    async run(scraperType = 'web-client') {
-        console.log(`Starting run method for scraper type: ${scraperType}`);
+    async run(scraperType: ScraperType = 'web-client'): Promise<void> {
+        logger.info({ scraperType }, 'Starting scraper');
+        
+        const scraper = this.scrapers[scraperType];
+
+        if (!scraper) {
+            const error = new Error(`Scraper '${scraperType}' is not available`);
+            logger.error({ scraperType, error }, 'Scraper not found');
+            throw error;
+        }
+
         try {
-            const scraper = this.scrapers[scraperType];
-
-            if (!scraper) {
-                throw new Error(`${scraperType}: scraper doesn't exist`);
-            }
-
             await scraper.start();
+            logger.info({ scraperType }, 'Scraper completed successfully');
         } catch (error) {
-            if (error instanceof Error) {
-                console.error(`Error in run method: ${error.message}`);
-            } else {
-                console.error(`Error in run method: ${error}`);
-            }
-        } finally {
-            console.log(`Ending run method for scraper type: ${scraperType}`);
+            logger.error(
+                { 
+                    scraperType, 
+                    err: error instanceof Error 
+                        ? { message: error.message, stack: error.stack } 
+                        : String(error)
+                }, 
+                'Scraper failed'
+            );
+            throw error;
         }
     }
 }

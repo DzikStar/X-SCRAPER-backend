@@ -1,12 +1,13 @@
 import Xscraper from './core/xscraper.js';
+import logger from './utils/logger.js';
 
-console.log('Script started');
+logger.info('X-SCRAPER service starting...');
 
 try {
     const xscraper = new Xscraper();
     await xscraper.run();
+    logger.info('X-SCRAPER service completed successfully');
 } catch (error) {
-    console.error('Error running Xscraper:', error);
+    logger.error({ err: error }, 'Failed to run X-SCRAPER service');
+    process.exit(1);
 }
-
-console.log('Script ended');
