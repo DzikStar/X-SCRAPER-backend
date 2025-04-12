@@ -6,15 +6,15 @@ import { getAsset } from '../utils/downloadManager.js';
 import { config } from '../core/config.js';
 
 export class ContentResolver {
-    async clearHTML() {
-        console.log('Starting removing index.html suppresion noise.');
+    async clearHTML(indexName: string) {
+        console.info(`Starting removing ${indexName} suppresion noise.`);
 
         let nonceCleared: number = 0,
             verifCardCleaned: boolean = false,
             removedReactStyles: boolean = false;
 
         try {
-            const indexHTML = await fs.readFile(`${config.process_path}/index.html`, 'utf-8');
+            const indexHTML = await fs.readFile(`${config.process_path}/${indexName}`, 'utf-8');
             const $ = cheerio.load(indexHTML);
 
             $('[nonce]').each((i, element) => {
@@ -54,12 +54,12 @@ export class ContentResolver {
             content = content.replace(RegExp('serverDate: .............,'), 'serverDate: 0000000000000,');
             content = content.replace(RegExp('userHash: "................................................................"'), 'userHash: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"');
 
-            await saveFile('index.html', content, config.process_path);
+            await saveFile(indexName, content, config.process_path);
         } catch (error) {
-            console.error('Error clearing index.html by clearHTML(): ', error);
+            console.error(`Error clearing ${indexName} by clearHTML(): `, error);
         }
 
-        console.log('Finished removing index.html supression noise.');
+        console.info(`Finished removing ${indexName} supression noise.`);
     }
 
     async getServiceWorkerScripts() {

@@ -18,8 +18,20 @@ export class WebClientScraper {
     async start() {
         console.log('Starting WebClientScraper start method');
         try {
-            await this.downloadCommonAssets();
-            await this.resolver.clearHTML();
+            do {
+                console.info("    [X-SCRAPER] Started safe release download attempt.")
+                await this.downloadCommonAssets('index1.html', 'sw1.js');
+                await this.resolver.clearHTML('index1.html');
+
+                await this.downloadCommonAssets('index2.html', 'sw2.js');
+                await this.resolver.clearHTML('index2.html');
+            } while (fs.open(`./${config.process_path}/index2.html`) != fs.open(`./${config.process_path}/index1.html`) || fs.open(`./${config.process_path}/sw2.js`) != fs.open(`./${config.process_path}/sw1.js`));
+
+            fs.rm(`./${config.process_path}/index1.html`);
+            fs.rm(`./${config.process_path}/sw1.html`);
+
+            fs.rename(`./${config.process_path}/index2.html`, `./${config.process_path}/index.html`);
+            fs.rename(`./${config.process_path}/sw2.html`, `./${config.process_path}/sw.html`);
 
             await this.downloadPlatformAssets();
 
@@ -35,12 +47,12 @@ export class WebClientScraper {
         }
     }
 
-    private async downloadCommonAssets() {
-        await getAsset('index.html', config.domain.twitter, `./${config.process_path}`, 'html');
-        await getAsset('sw.js', `${config.domain.twitter}/sw.js`, `./${config.process_path}`, 'js');
+    private async downloadCommonAssets(index: string, sw: string) {
+        await getAsset(index, config.domain.twitter, `./${config.process_path}`, 'html');
+        await getAsset(sw, `${config.domain.twitter}/sw.js`, `./${config.process_path}`, 'js');
 
         const filesExist = await Promise.all(
-            ['index.html', 'sw.js'].map(async file => {
+            [index, sw].map(async file => {
                 try {
                     await fs.access(join(`./${config.process_path}`, file));
                     return true;
