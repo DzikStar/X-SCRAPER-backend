@@ -18,22 +18,22 @@ export class WebClientScraper {
 
     async start(): Promise<void> {
         logger.debug('Initializing web client scraping process');
-        
+
         try {
             logger.info('Downloading common assets');
             await this.downloadCommonAssets();
-            
+
             await this.resolver.clearHTML();
-            
+
             logger.info('Downloading platform-specific assets');
             await this.downloadPlatformAssets();
-            
+
             logger.info('Preparing repository');
             await this.initRepo();
-            
+
             const sourcePath = `./${config.process_path}`;
             const targetPath = `./${config.github.output_repo}`;
-            
+
             logger.debug({ source: sourcePath, target: targetPath }, 'Copying processed files to output repository');
             await fs.cp(sourcePath, targetPath, { recursive: true, force: true });
 
@@ -41,16 +41,14 @@ export class WebClientScraper {
 
             logger.debug({ path: sourcePath }, 'Cleaning up temporary files');
             await clearPath(sourcePath);
-            
+
             logger.info('Web client scraping completed successfully');
         } catch (error) {
             logger.error(
-                { 
-                    err: error instanceof Error 
-                        ? { message: error.message, stack: error.stack } 
-                        : String(error)
-                }, 
-                'Web client scraping failed'
+                {
+                    err: error instanceof Error ? { message: error.message, stack: error.stack } : String(error),
+                },
+                'Web client scraping failed',
             );
             throw error;
         }

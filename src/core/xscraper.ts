@@ -19,7 +19,7 @@ export default class Xscraper {
 
     async run(scraperType: ScraperType = 'web-client'): Promise<void> {
         logger.info({ scraperType }, 'Starting scraper');
-        
+
         const scraper = this.scrapers[scraperType];
 
         if (!scraper) {
@@ -33,13 +33,11 @@ export default class Xscraper {
             logger.info({ scraperType }, 'Scraper completed successfully');
         } catch (error) {
             logger.error(
-                { 
-                    scraperType, 
-                    err: error instanceof Error 
-                        ? { message: error.message, stack: error.stack } 
-                        : String(error)
-                }, 
-                'Scraper failed'
+                {
+                    scraperType,
+                    err: error instanceof Error ? { message: error.message, stack: error.stack } : String(error),
+                },
+                'Scraper failed',
             );
             throw error;
         }

@@ -7,7 +7,7 @@ type FormatType = 'js' | 'html' | 'text';
 
 export async function fetchFromURL(url: string): Promise<Response> {
     logger.debug({ url }, 'Fetching remote content');
-    
+
     try {
         const response = await fetch(url, {
             headers: {
@@ -17,41 +17,34 @@ export async function fetchFromURL(url: string): Promise<Response> {
                 'Cache-Control': 'no-cache',
             },
         });
-        
+
         if (!response.ok) {
             throw new Error(`Failed to fetch from ${url}: ${response.status} ${response.statusText}`);
         }
-        
+
         logger.debug({ url, status: response.status }, 'Fetch completed successfully');
         return response;
     } catch (error) {
         logger.error(
-            { 
-                url, 
-                err: error instanceof Error 
-                    ? { message: error.message, stack: error.stack } 
-                    : String(error)
-            }, 
-            'Failed to fetch from URL'
+            {
+                url,
+                err: error instanceof Error ? { message: error.message, stack: error.stack } : String(error),
+            },
+            'Failed to fetch from URL',
         );
         throw error;
     }
 }
 
-export async function getAsset(
-    name: string, 
-    url: string, 
-    savePath: string = `./${config.github.output_repo}`, 
-    formatting: 'js' | 'html' | 'text' = 'text'
-): Promise<void> {
+export async function getAsset(name: string, url: string, savePath: string = `./${config.github.output_repo}`, formatting: 'js' | 'html' | 'text' = 'text'): Promise<void> {
     logger.debug({ name, url, savePath, formatting }, 'Downloading asset');
-    
+
     try {
         const response = await fetchFromURL(url);
         const content = await response.text();
-        
+
         let formattedContent: string;
-        
+
         switch (formatting) {
             case 'js':
                 logger.debug({ name }, 'Formatting JavaScript content');
@@ -63,7 +56,7 @@ export async function getAsset(
                     printWidth: 2000,
                 });
                 break;
-                
+
             case 'html':
                 logger.debug({ name }, 'Formatting HTML content');
                 formattedContent = await prettier.format(content, {
@@ -73,7 +66,7 @@ export async function getAsset(
                     printWidth: 2000,
                 });
                 break;
-                
+
             case 'text':
             default:
                 formattedContent = content;
@@ -82,18 +75,15 @@ export async function getAsset(
 
         await saveFile(name, formattedContent, savePath);
         logger.info({ name, savePath }, 'Asset downloaded and saved successfully');
-        
     } catch (error) {
         logger.error(
             {
                 name,
                 url,
                 savePath,
-                err: error instanceof Error 
-                    ? { message: error.message, stack: error.stack } 
-                    : String(error)
+                err: error instanceof Error ? { message: error.message, stack: error.stack } : String(error),
             },
-            'Failed to download and save asset'
+            'Failed to download and save asset',
         );
         throw error;
     }

@@ -37,20 +37,21 @@ export class ContentResolver {
                 const originalContent = $(element).html();
 
                 if (originalContent) {
-                    const cleaned = originalContent
-                        .replace(/^\s*\.r-vlxjld\b[^{]*\{[^}]*\}\s*$\n?/gm, '')
-                        .replace(/^\s*\.r-yfoy6g\b[^{]*\{[^}]*\}\s*$\n?/gm, '');
+                    const cleaned = originalContent.replace(/^\s*\.r-vlxjld\b[^{]*\{[^}]*\}\s*$\n?/gm, '').replace(/^\s*\.r-yfoy6g\b[^{]*\{[^}]*\}\s*$\n?/gm, '');
 
                     $(element).html(cleaned);
                     removedReactStyles = true;
                 }
             });
 
-            logger.info({
-                nonceCleared,
-                verifCardCleaned,
-                removedReactStyles
-            }, 'HTML cleaning statistics');
+            logger.info(
+                {
+                    nonceCleared,
+                    verifCardCleaned,
+                    removedReactStyles,
+                },
+                'HTML cleaning statistics',
+            );
 
             let content = await prettier.format($.html(), {
                 parser: 'html',
@@ -69,12 +70,10 @@ export class ContentResolver {
             logger.info('Index.html successfully cleaned and saved');
         } catch (error) {
             logger.error(
-                { 
-                    err: error instanceof Error 
-                        ? { message: error.message, stack: error.stack } 
-                        : String(error)
-                }, 
-                'Failed to clean index.html'
+                {
+                    err: error instanceof Error ? { message: error.message, stack: error.stack } : String(error),
+                },
+                'Failed to clean index.html',
             );
             throw error;
         }
@@ -82,21 +81,21 @@ export class ContentResolver {
 
     async getServiceWorkerScripts(): Promise<void> {
         logger.info('Processing service worker scripts');
-        
+
         try {
             const swPath = `${config.process_path}/sw.js`;
             logger.debug({ path: swPath }, 'Reading service worker file');
-            
+
             const swFile = await fs.readFile(swPath, 'utf-8');
             const swURL = swFile.match(/importScripts\s*\(\s*(['"])(.*?)\1/);
 
             if (swURL && swURL[2]) {
                 const scriptUrl = swURL[2];
                 logger.info({ scriptUrl }, 'Service worker script detected');
-                
+
                 const filename = this.getFilename(scriptUrl);
                 const path = this.getPath(scriptUrl);
-                
+
                 logger.debug({ scriptUrl, filename, path }, 'Downloading service worker script');
                 await getAsset(filename, scriptUrl, path, 'js');
             } else {
@@ -104,12 +103,10 @@ export class ContentResolver {
             }
         } catch (error) {
             logger.error(
-                { 
-                    err: error instanceof Error 
-                        ? { message: error.message, stack: error.stack } 
-                        : String(error)
-                }, 
-                'Failed to process service worker scripts'
+                {
+                    err: error instanceof Error ? { message: error.message, stack: error.stack } : String(error),
+                },
+                'Failed to process service worker scripts',
             );
             throw error;
         }
@@ -117,40 +114,38 @@ export class ContentResolver {
 
     async getInitScripts(): Promise<void> {
         logger.info('Processing initialization scripts from HTML');
-        
+
         try {
             const indexPath = `${config.process_path}/index.html`;
             logger.debug({ path: indexPath }, 'Reading index.html file');
-            
+
             const indexHTML = await fs.readFile(indexPath, 'utf-8');
             const $ = cheerio.load(indexHTML);
 
             const elements = $('link[rel="preload"]').get();
             logger.info({ scriptCount: elements.length }, 'Found preloaded scripts to download');
-            
+
             let downloadedCount = 0;
-            
+
             for (const element of elements) {
                 const assetUrl = $(element).attr('href');
                 if (assetUrl) {
                     const filename = this.getFilename(assetUrl);
                     const path = this.getPath(assetUrl);
-                    
+
                     logger.debug({ assetUrl, filename, path }, 'Downloading initialization script');
                     await getAsset(filename, assetUrl, path, 'js');
                     downloadedCount++;
                 }
             }
-            
+
             logger.info({ downloadedCount }, 'Successfully downloaded initialization scripts');
         } catch (error) {
             logger.error(
-                { 
-                    err: error instanceof Error 
-                        ? { message: error.message, stack: error.stack } 
-                        : String(error)
-                }, 
-                'Failed to download initialization scripts'
+                {
+                    err: error instanceof Error ? { message: error.message, stack: error.stack } : String(error),
+                },
+                'Failed to download initialization scripts',
             );
             throw error;
         }
@@ -158,11 +153,11 @@ export class ContentResolver {
 
     async getSHA(): Promise<string | undefined> {
         logger.info('Extracting release SHA from service worker');
-        
+
         try {
             const swPath = `${config.process_path}/sw.js`;
             logger.debug({ path: swPath }, 'Reading service worker file');
-            
+
             const swFile = await fs.readFile(swPath, 'utf-8');
             const SHA = swFile.match(/sha:\s*"([a-f0-9]{40})"/);
 
@@ -176,17 +171,15 @@ export class ContentResolver {
             }
         } catch (error) {
             logger.error(
-                { 
-                    err: error instanceof Error 
-                        ? { message: error.message, stack: error.stack } 
-                        : String(error)
-                }, 
-                'Failed to extract SHA from service worker'
+                {
+                    err: error instanceof Error ? { message: error.message, stack: error.stack } : String(error),
+                },
+                'Failed to extract SHA from service worker',
             );
             return undefined;
         }
     }
-    
+
     private getPath(url: string): string {
         if (!url.startsWith(`${config.domain.abs_twimg}/responsive-web`)) {
             return url;
