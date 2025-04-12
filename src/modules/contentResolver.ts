@@ -4,29 +4,35 @@ import { promises as fs } from 'node:fs';
 import { saveFile } from '../utils/fileManager.js';
 import { getAsset } from '../utils/downloadManager.js';
 import { config } from '../core/config.js';
+import logger from '../utils/logger.js';
 
 export class ContentResolver {
-    async clearHTML() {
-        console.log('Starting removing index.html suppresion noise.');
+    async clearHTML(): Promise<void> {
+        logger.info('Cleaning index.html file of tracking elements and sensitive data');
 
         let nonceCleared: number = 0,
             verifCardCleaned: boolean = false,
             removedReactStyles: boolean = false;
 
         try {
-            const indexHTML = await fs.readFile(`${config.process_path}/index.html`, 'utf-8');
+            const indexPath = `${config.process_path}/index.html`;
+            logger.debug({ path: indexPath }, 'Reading index.html file');
+            const indexHTML = await fs.readFile(indexPath, 'utf-8');
             const $ = cheerio.load(indexHTML);
 
+            // Remove nonce attributes
             $('[nonce]').each((i, element) => {
                 $(element).attr('nonce', 'REPLACED_BY_X-SCRAPER');
                 nonceCleared++;
             });
 
+            // Clean verification tags
             $('meta[name="twitter-site-verification"]').each((i, element) => {
                 $(element).attr('content', 'REPLACED_BY_X-SCRAPER');
                 verifCardCleaned = true;
             });
 
+            // Clean React native stylesheet
             $('style#react-native-stylesheet').each((i, element) => {
                 const originalContent = $(element).html();
 
@@ -38,9 +44,14 @@ export class ContentResolver {
                 }
             });
 
-            console.info(`    [X-SCRAPER] Nonce cleared count: ${nonceCleared}`);
-            console.info(`    [X-SCRAPER] twitter-site-verification meta tag is cleared: ${verifCardCleaned}`);
-            console.info(`    [X-SCRAPER] react-native-stylesheet style classes cleared: ${removedReactStyles}`);
+            logger.info(
+                {
+                    nonceCleared,
+                    verifCardCleaned,
+                    removedReactStyles,
+                },
+                'HTML cleaning statistics',
+            );
 
             let content = await prettier.format($.html(), {
                 parser: 'html',
@@ -49,68 +60,124 @@ export class ContentResolver {
                 printWidth: 2000,
             });
 
+            logger.debug('Anonymizing sensitive identifiers in HTML');
             content = content.replace(RegExp('gt=...................'), 'gt=0000000000000000000');
             content = content.replace(RegExp('guestId: ".................."'), 'guestId: "000000000000000000"');
             content = content.replace(RegExp('serverDate: .............,'), 'serverDate: 0000000000000,');
             content = content.replace(RegExp('userHash: "................................................................"'), 'userHash: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"');
 
             await saveFile('index.html', content, config.process_path);
+            logger.info('Index.html successfully cleaned and saved');
         } catch (error) {
-            console.error('Error clearing index.html by clearHTML(): ', error);
+            logger.error(
+                {
+                    err: error instanceof Error ? { message: error.message, stack: error.stack } : String(error),
+                },
+                'Failed to clean index.html',
+            );
+            throw error;
         }
-
-        console.log('Finished removing index.html supression noise.');
     }
 
-    async getServiceWorkerScripts() {
-        console.info('Started getServiceWorkerScripts method');
+    async getServiceWorkerScripts(): Promise<void> {
+        logger.info('Processing service worker scripts');
+
         try {
-            const swFile = await fs.readFile(`${config.process_path}/sw.js`, 'utf-8');
+            const swPath = `${config.process_path}/sw.js`;
+            logger.debug({ path: swPath }, 'Reading service worker file');
+
+            const swFile = await fs.readFile(swPath, 'utf-8');
             const swURL = swFile.match(/importScripts\s*\(\s*(['"])(.*?)\1/);
 
             if (swURL && swURL[2]) {
-                console.info(`    [X-SCRAPER] Service Worker detected: ${swURL[2]}`);
-                await getAsset(this.getFilename(swURL[2]), swURL[2], this.getPath(swURL[2]), 'js');
+                const scriptUrl = swURL[2];
+                logger.info({ scriptUrl }, 'Service worker script detected');
+
+                const filename = this.getFilename(scriptUrl);
+                const path = this.getPath(scriptUrl);
+
+                logger.debug({ scriptUrl, filename, path }, 'Downloading service worker script');
+                await getAsset(filename, scriptUrl, path, 'js');
+            } else {
+                logger.warn('No service worker scripts found in SW file');
             }
         } catch (error) {
-            console.error('Errror in getServiceWorkerScripts method: ', error);
+            logger.error(
+                {
+                    err: error instanceof Error ? { message: error.message, stack: error.stack } : String(error),
+                },
+                'Failed to process service worker scripts',
+            );
+            throw error;
         }
-        console.info('Finished getServiceWorkerScripts method');
     }
 
-    async getInitScripts() {
-        console.info('Starting getInitScripts method');
+    async getInitScripts(): Promise<void> {
+        logger.info('Processing initialization scripts from HTML');
+
         try {
-            const indexHTML = await fs.readFile(`${config.process_path}/index.html`, 'utf-8');
+            const indexPath = `${config.process_path}/index.html`;
+            logger.debug({ path: indexPath }, 'Reading index.html file');
+
+            const indexHTML = await fs.readFile(indexPath, 'utf-8');
             const $ = cheerio.load(indexHTML);
 
             const elements = $('link[rel="preload"]').get();
+            logger.info({ scriptCount: elements.length }, 'Found preloaded scripts to download');
+
+            let downloadedCount = 0;
+
             for (const element of elements) {
                 const assetUrl = $(element).attr('href');
                 if (assetUrl) {
-                    await getAsset(this.getFilename(assetUrl), assetUrl, this.getPath(assetUrl), 'js');
+                    const filename = this.getFilename(assetUrl);
+                    const path = this.getPath(assetUrl);
+
+                    logger.debug({ assetUrl, filename, path }, 'Downloading initialization script');
+                    await getAsset(filename, assetUrl, path, 'js');
+                    downloadedCount++;
                 }
             }
+
+            logger.info({ downloadedCount }, 'Successfully downloaded initialization scripts');
         } catch (error) {
-            console.info('Error on getInitScripts method', error);
+            logger.error(
+                {
+                    err: error instanceof Error ? { message: error.message, stack: error.stack } : String(error),
+                },
+                'Failed to download initialization scripts',
+            );
+            throw error;
         }
-        console.info('Ending getInitScripts method');
     }
 
-    async getSHA() {
-        console.info('Started getSHA method');
+    async getSHA(): Promise<string | undefined> {
+        logger.info('Extracting release SHA from service worker');
+
         try {
-            const swFile = await fs.readFile(`${config.process_path}/sw.js`, 'utf-8');
+            const swPath = `${config.process_path}/sw.js`;
+            logger.debug({ path: swPath }, 'Reading service worker file');
+
+            const swFile = await fs.readFile(swPath, 'utf-8');
             const SHA = swFile.match(/sha:\s*"([a-f0-9]{40})"/);
 
-            if (SHA) {
-                console.info(`    [X-SCRAPER] Release SHA: ${SHA[1]}`);
-                return SHA[1];
+            if (SHA && SHA[1]) {
+                const shaValue = SHA[1];
+                logger.info({ sha: shaValue }, 'Release SHA extracted successfully');
+                return shaValue;
+            } else {
+                logger.warn('No SHA hash found in service worker file');
+                return undefined;
             }
         } catch (error) {
-            console.error('Error in getSHA method: ', error);
+            logger.error(
+                {
+                    err: error instanceof Error ? { message: error.message, stack: error.stack } : String(error),
+                },
+                'Failed to extract SHA from service worker',
+            );
+            return undefined;
         }
-        console.info('Finished getSHA method');
     }
 
     private getPath(url: string): string {

@@ -5,6 +5,7 @@ import { getAsset } from '../utils/downloadManager.js';
 import { clearPath } from '../utils/fileManager.js';
 import { promises as fs } from 'node:fs';
 import { join } from 'node:path';
+import logger from '../utils/logger.js';
 
 export class WebClientScraper {
     private git: Github;
@@ -15,23 +16,41 @@ export class WebClientScraper {
         this.resolver = new ContentResolver();
     }
 
-    async start() {
-        console.log('Starting WebClientScraper start method');
+    async start(): Promise<void> {
+        logger.debug('Initializing web client scraping process');
+
         try {
+            logger.info('Downloading common assets');
             await this.downloadCommonAssets();
+
             await this.resolver.clearHTML();
 
+            logger.info('Downloading platform-specific assets');
             await this.downloadPlatformAssets();
 
+            logger.info('Preparing repository');
             await this.initRepo();
-            await fs.cp(`./${config.process_path}`, `./${config.github.output_repo}`, { recursive: true, force: true });
+
+            const sourcePath = `./${config.process_path}`;
+            const targetPath = `./${config.github.output_repo}`;
+
+            logger.debug({ source: sourcePath, target: targetPath }, 'Copying processed files to output repository');
+            await fs.cp(sourcePath, targetPath, { recursive: true, force: true });
+
             await this.commitChanges();
 
-            await clearPath(`./${config.process_path}`);
+            logger.debug({ path: sourcePath }, 'Cleaning up temporary files');
+            await clearPath(sourcePath);
+
+            logger.info('Web client scraping completed successfully');
         } catch (error) {
-            console.error('Error in WebClientScraper start method:', error);
-        } finally {
-            console.log('Ending WebClientScraper start method');
+            logger.error(
+                {
+                    err: error instanceof Error ? { message: error.message, stack: error.stack } : String(error),
+                },
+                'Web client scraping failed',
+            );
+            throw error;
         }
     }
 
