@@ -7,16 +7,16 @@ import { config } from '../core/config.js';
 import logger from '../utils/logger.js';
 
 export class ContentResolver {
-    async clearHTML(): Promise<void> {
-        logger.info('Cleaning index.html file of tracking elements and sensitive data');
+    async clearHTML(indexName: string): Promise<void> {
+        logger.debug({ filename: indexName } ,'Cleaning HTML file from non-static content');
 
         let nonceCleared: number = 0,
             verifCardCleaned: boolean = false,
             removedReactStyles: boolean = false;
 
         try {
-            const indexPath = `${config.process_path}/index.html`;
-            logger.debug({ path: indexPath }, 'Reading index.html file');
+            const indexPath = `${config.process_path}/${indexName}`;
+            logger.debug({ path: indexPath, file: indexName }, 'Reading Index file');
             const indexHTML = await fs.readFile(indexPath, 'utf-8');
             const $ = cheerio.load(indexHTML);
 
@@ -66,14 +66,14 @@ export class ContentResolver {
             content = content.replace(RegExp('serverDate: .............,'), 'serverDate: 0000000000000,');
             content = content.replace(RegExp('userHash: "................................................................"'), 'userHash: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"');
 
-            await saveFile('index.html', content, config.process_path);
-            logger.info('Index.html successfully cleaned and saved');
+            await saveFile(indexName, content, config.process_path);
+            logger.debug({ filename: indexName }, 'HTML successfully cleaned and saved');
         } catch (error) {
             logger.error(
                 {
                     err: error instanceof Error ? { message: error.message, stack: error.stack } : String(error),
                 },
-                'Failed to clean index.html',
+                'Failed to clean HTML',
             );
             throw error;
         }
