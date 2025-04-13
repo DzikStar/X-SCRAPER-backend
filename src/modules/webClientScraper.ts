@@ -36,7 +36,7 @@ export class WebClientScraper {
                 areSwSame = await this.areFilesEqual(`./${config.process_path}/sw1.js`, `./${config.process_path}/sw2.js`);
 
                 if (!areIndexesSame || !areSwSame) {
-                    logger.debug(
+                    logger.info(
                         {
                             attempt: safemodeRetries,
                             areIndexesSame: areIndexesSame,
@@ -58,7 +58,7 @@ export class WebClientScraper {
             logger.info('Successfully renamed second sample to main files')
 
             logger.info('Downloading platform static assets');
-            await this.downloadStaticAssets();
+            await this.downloadPreloadAssets();
 
             logger.info('Preparing repository');
             await this.initRepo();
@@ -106,7 +106,7 @@ export class WebClientScraper {
         }
     }
 
-    private async downloadStaticAssets() {
+    private async downloadPreloadAssets() {
         await this.resolver.getServiceWorkerScripts();
         await this.resolver.getInitScripts();
     }
