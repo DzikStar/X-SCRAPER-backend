@@ -200,7 +200,7 @@ export class ContentResolver {
                 .replace(/'/g, '"')
                 .replace(/,\s*(\]|$)/g, '$1')
                 .trim();
-            logger.debug({ swTableContent }, 'Processed ASSETS content');
+            logger.debug({ swTableContent: swTableContent.length }, 'Processed ASSETS content');
 
             try {
                 const parsedAssets: string[] = JSON.parse(`[${swTableContent}]`);
