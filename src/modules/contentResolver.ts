@@ -190,7 +190,7 @@ export class ContentResolver {
 
             const swMatch = swContent.match(/self\.ASSETS\s*=\s*\[([\s\S]*?)\];/);
             if (!swMatch) {
-                logger.warn({ file: swFilePath }, "No matching ASSETS array found in sw.js");
+                logger.warn({ file: swFilePath }, 'No matching ASSETS array found in sw.js');
                 throw new Error("Couldn't match content in sw.js");
             }
             logger.debug('ASSETS array matched in sw.js');
