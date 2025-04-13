@@ -8,7 +8,7 @@ import logger from '../utils/logger.js';
 
 export class ContentResolver {
     async clearHTML(indexName: string): Promise<void> {
-        logger.debug({ filename: indexName } ,'Cleaning HTML file from non-static content');
+        logger.debug({ filename: indexName }, 'Cleaning HTML file from non-static content');
 
         let nonceCleared: number = 0,
             verifCardCleaned: boolean = false,
@@ -178,6 +178,37 @@ export class ContentResolver {
             );
             return undefined;
         }
+    }
+
+    async getAssetsFromSW(): Promise<Array<string> | undefined> {
+        logger.debug('Extracting static URLs from sw.js');
+        try {
+            const swContent = await fs.readFile(`./${config.process_path}/sw.js`, 'utf-8');
+            const swMatch = swContent.match(/self\.ASSETS\s*=\s*\[([\s\S]*?)\];/);  
+
+            if (!swMatch) {
+                throw logger.info({ file: `./${config.process_path}/sw.js` }, "Couldn't match content");
+            }
+
+            // Replace apostrophes with quotation marks and replaced comas ad the end of array
+            const swTableContent = swMatch[1].replace(/'/g, '"').replace(/,\s*(\]|$)/g, '$1').trim();
+
+            try {
+                const assets: string[] = JSON.parse(`[${swTableContent}]`);
+                return assets;
+            } catch (error) {
+                logger.error({ err: error }, 'Cannot parse ASSETS table')
+                throw error;
+            }
+        } catch (error) {
+            logger.error({ err: error }, 'Extracting static URLs from sw.js failed');
+            throw error;
+        }
+    }
+
+    getAssetsFromIndex(): Array<string> {
+        logger.debug('Extracting static URLs from sw.js');
+        return ['TODO'];
     }
 
     private getPath(url: string): string {

@@ -51,14 +51,17 @@ export class WebClientScraper {
 
             await fs.rm(`./${config.process_path}/index1.html`);
             await fs.rm(`./${config.process_path}/sw1.js`);
-            logger.info('Successfully removed the first sample')
+            logger.info('Successfully removed the first sample');
 
             await fs.rename(`./${config.process_path}/index2.html`, `./${config.process_path}/index.html`);
             await fs.rename(`./${config.process_path}/sw2.js`, `./${config.process_path}/sw.js`);
-            logger.info('Successfully renamed second sample to main files')
+            logger.info('Successfully renamed second sample to main files');
 
-            logger.info('Downloading platform static assets');
+            logger.debug('Downloading preload static assets');
             await this.downloadPreloadAssets();
+
+            logger.debug('Donwloading static assets');
+            await this.downloadStaticAssets();
 
             logger.info('Preparing repository');
             await this.initRepo();
@@ -109,6 +112,17 @@ export class WebClientScraper {
     private async downloadPreloadAssets() {
         await this.resolver.getServiceWorkerScripts();
         await this.resolver.getInitScripts();
+    }
+
+    private async downloadStaticAssets(): Promise<void> {
+        const swAssets = await this.resolver.getAssetsFromSW();
+        // const indexAssets = await this.resolver.getAssetsFromIndex();
+        logger.info(
+            {
+                sw: swAssets?.length,
+            },
+            'Found static assets',
+        );
     }
 
     private async initRepo() {
