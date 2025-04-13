@@ -9,47 +9,6 @@ export class Github {
         this.PAT = process.env.GH_PERSONAL_ACCESS_TOKEN || '';
     }
 
-    private setRemote(PAT: string, outputRepo: string): void {
-        logger.debug({ repo: outputRepo }, 'Setting git remote URL');
-
-        try {
-            const maskedPAT = PAT ? `${PAT.substring(0, 4)}...${PAT.substring(PAT.length - 4)}` : 'not-provided';
-            logger.debug({ repo: outputRepo, token: maskedPAT }, 'Configuring remote with access token');
-
-            execSync(`git remote set-url origin https://x-access-token:${PAT}@github.com/${outputRepo}.git`);
-            logger.info({ repo: outputRepo }, 'Git remote URL configured successfully');
-        } catch (error) {
-            logger.error(
-                {
-                    repo: outputRepo,
-                    err: error instanceof Error ? { message: error.message, stack: error.stack } : String(error),
-                },
-                'Failed to set git remote URL',
-            );
-            throw error;
-        }
-    }
-
-    private setUser(username: string, usermail: string): void {
-        logger.debug({ username, email: usermail }, 'Setting git user configuration');
-
-        try {
-            execSync(`git config user.name "${username}"`);
-            execSync(`git config user.email "${usermail}"`);
-            logger.info({ username }, 'Git user configuration set successfully');
-        } catch (error) {
-            logger.error(
-                {
-                    username,
-                    email: usermail,
-                    err: error instanceof Error ? { message: error.message, stack: error.stack } : String(error),
-                },
-                'Failed to set git user configuration',
-            );
-            throw error;
-        }
-    }
-
     clone(repo: string): void {
         logger.info({ repo }, 'Cloning GitHub repository');
 
