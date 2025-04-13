@@ -10,9 +10,9 @@ export class ContentResolver {
     async clearHTML(indexName: string): Promise<void> {
         logger.debug({ filename: indexName }, 'Cleaning HTML file from non-static content');
 
-        let nonceCleared: number = 0,
-            verifCardCleaned: boolean = false,
-            removedReactStyles: boolean = false;
+        let nonceCleared = 0,
+            verifCardCleaned = false,
+            removedReactStyles = false;
 
         try {
             const indexPath = `${config.process_path}/${indexName}`;
@@ -180,7 +180,7 @@ export class ContentResolver {
         }
     }
 
-    async getAssetsFromSW(): Promise<Array<string> | undefined> {
+    async getAssetsFromSW(): Promise<string[] | undefined> {
         logger.debug('Starting extraction of static URLs from sw.js');
         try {
             const swFilePath = `./${config.process_path}/sw.js`;
@@ -215,7 +215,7 @@ export class ContentResolver {
         }
     }
 
-    getAssetsFromIndex(): Array<string> {
+    getAssetsFromIndex(): string[] {
         logger.debug('Extracting static URLs from sw.js');
         return ['TODO'];
     }
