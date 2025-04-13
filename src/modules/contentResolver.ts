@@ -181,24 +181,33 @@ export class ContentResolver {
     }
 
     async getAssetsFromSW(): Promise<Array<string> | undefined> {
-        logger.debug('Extracting static URLs from sw.js');
+        logger.debug('Starting extraction of static URLs from sw.js');
         try {
-            const swContent = await fs.readFile(`./${config.process_path}/sw.js`, 'utf-8');
-            const swMatch = swContent.match(/self\.ASSETS\s*=\s*\[([\s\S]*?)\];/);  
+            const swFilePath = `./${config.process_path}/sw.js`;
+            logger.debug({ filePath: swFilePath }, 'Reading service worker file');
+            const swContent = await fs.readFile(swFilePath, 'utf-8');
+            logger.debug({ contentLength: swContent.length }, 'Service worker file read successfully');
 
+            const swMatch = swContent.match(/self\.ASSETS\s*=\s*\[([\s\S]*?)\];/);
             if (!swMatch) {
-                throw logger.info({ file: `./${config.process_path}/sw.js` }, "Couldn't match content");
+                logger.warn({ file: swFilePath }, "No matching ASSETS array found in sw.js");
+                throw new Error("Couldn't match content in sw.js");
             }
+            logger.debug('ASSETS array matched in sw.js');
 
-            // Replace apostrophes with quotation marks and replaced comas ad the end of array
-            const swTableContent = swMatch[1].replace(/'/g, '"').replace(/,\s*(\]|$)/g, '$1').trim();
+            // Replace apostrophes with quotation marks and trim trailing commas
+            const swTableContent = swMatch[1]
+                .replace(/'/g, '"')
+                .replace(/,\s*(\]|$)/g, '$1')
+                .trim();
+            logger.debug({ swTableContent }, 'Processed ASSETS content');
 
             try {
-                const assets: string[] = JSON.parse(`[${swTableContent}]`);
-                return assets;
-            } catch (error) {
-                logger.error({ err: error }, 'Cannot parse ASSETS table')
-                throw error;
+                const parsedAssets: string[] = JSON.parse(`[${swTableContent}]`);
+                return parsedAssets;
+            } catch (parseError) {
+                logger.error({ err: parseError }, 'Failed to parse ASSETS table JSON');
+                throw parseError;
             }
         } catch (error) {
             logger.error({ err: error }, 'Extracting static URLs from sw.js failed');
