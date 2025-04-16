@@ -151,12 +151,12 @@ export class ContentResolver {
         }
     }
 
-    async getSHA(): Promise<string | undefined> {
-        logger.info('Extracting release SHA from service worker');
+    async getSHA(path: string): Promise<string | undefined> {
+        logger.info('Extracting release SHA from sw.js');
 
         try {
-            const swPath = `${config.process_path}/sw.js`;
-            logger.debug({ path: swPath }, 'Reading service worker file');
+            const swPath = `${path}/sw.js`;
+            logger.debug({ path: swPath }, 'Reading sw.js file');
 
             const swFile = await fs.readFile(swPath, 'utf-8');
             const SHA = swFile.match(/sha:\s*"([a-f0-9]{40})"/);
@@ -166,7 +166,7 @@ export class ContentResolver {
                 logger.info({ sha: shaValue }, 'Release SHA extracted successfully');
                 return shaValue;
             } else {
-                logger.warn('No SHA hash found in service worker file');
+                logger.warn('No SHA hash found in sw.js file');
                 return undefined;
             }
         } catch (error) {
