@@ -27,14 +27,17 @@ A powerful Node.js tool designed for scraping the latest assets from the web ver
 ## Usage
 1. Configure `xscraper.config.json` file.
 2. Rename `.env.example` to `.env` and setup all required elements.
-3. Build X-SCRAPER tool
-    ```bash
-    node run build
-    ```
-4. Run X-SCRAPER
+3. Run X-SCRAPER
     ```bash
     node run start
     ```
+
+## Transpilate to JS
+You might wanna use X-SCRAPPER in your project written in JS. Use then:
+```bash
+node run build
+```
+
 
 ## Contributing
 Contributions are welcome! Feel free to fork the repository and submit a pull request.

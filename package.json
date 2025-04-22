@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "build": "tsc",
-    "start": "node --env-file-if-exists=.env dist/index.js",
+    "start": "tsx --env-file-if-exists=.env src/index.js",
     "dev": "tsx --watch --env-file .env src/index.ts",
     "check-format": "prettier --check ./src",
     "format": "prettier --write ./src"
