@@ -26,8 +26,6 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Build project
-
       - name: Run scraper
         run: npm run start
         env:
