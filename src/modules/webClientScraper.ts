@@ -72,7 +72,7 @@ export class WebClientScraper {
             );
 
             if (config.exit_if_no_differences === true && indexNoChanges && swNoChanges) {
-                logger.debug('No changed found.');
+                logger.debug('No changes found.');
                 return;
             }
 
