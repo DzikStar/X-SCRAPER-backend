@@ -26,10 +26,10 @@ export async function clearPath(targetPath: string): Promise<void> {
 
 export async function saveFile(fileName: string, fileContent: string, filePath: string = './'): Promise<void> {
     const fullPath = path.join(filePath, fileName);
-    logger.debug({ file: fullPath }, 'Saving file');
+    logger.debug({ path: filePath, file: fullPath }, 'Saving file');
 
     try {
-        await fs.mkdir(filePath, { recursive: true });
+        await fs.mkdir(path.dirname(fullPath), { recursive: true });
 
         await fs.writeFile(fullPath, fileContent);
 

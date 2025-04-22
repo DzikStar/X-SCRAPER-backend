@@ -117,12 +117,23 @@ export class WebClientScraper {
     private async downloadStaticAssets(): Promise<void> {
         const swAssets = await this.resolver.getAssetsFromSW();
         // const indexAssets = await this.resolver.getAssetsFromIndex();
+
         logger.info(
             {
                 sw: swAssets?.length,
             },
             'Found static assets',
         );
+
+        for (const asset of swAssets || []) {
+            let filename = this.resolver.getFilename(asset);
+            const path = this.resolver.getPath(asset);
+
+            filename = this.resolver.fixPath(filename);
+
+            logger.debug({ asset, filename, path }, 'Downloading static script');
+            await getAsset(filename, asset, path, 'js');
+        }
     }
 
     private async initRepo() {

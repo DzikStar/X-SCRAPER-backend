@@ -220,7 +220,7 @@ export class ContentResolver {
         return ['TODO'];
     }
 
-    private getPath(url: string): string {
+    getPath(url: string): string {
         if (!url.startsWith(`${config.domain.abs_twimg}/responsive-web`)) {
             return url;
         }
@@ -233,7 +233,22 @@ export class ContentResolver {
         return pathSegments.join('/');
     }
 
-    private getFilename(url: string): string {
+    fixPath(filename: string): string {
+        const lastDot = filename.lastIndexOf('.');
+
+        filename = filename.replace('~~', '/');
+        filename = filename.replace('~', '/');
+
+        if (lastDot !== -1) {
+            filename = filename.substring(0, lastDot).replace(/\./g, '/') + filename.substring(lastDot);
+        } else {
+            filename = filename.replace(/\./g, '/');
+        }
+
+        return filename;
+    }
+
+    getFilename(url: string): string {
         const filenameWithSHA = url.substring(url.lastIndexOf('/') + 1);
         return filenameWithSHA.replace(/^(.*)\.[a-f0-9]{8}(\.[^.]+)$/, '$1$2');
     }
