@@ -1,5 +1,6 @@
 {
     "deploy_on_github": true,
+    "exit_if_no_differences": true,
     "process_path": "X-SCRAPER-new",
     "github": {
         "repos_owner": "DzikStar",

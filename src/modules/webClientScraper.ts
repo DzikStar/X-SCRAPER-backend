@@ -57,14 +57,30 @@ export class WebClientScraper {
             await fs.rename(`./${config.process_path}/sw2.js`, `./${config.process_path}/sw.js`);
             logger.info('Successfully renamed second sample to main files');
 
+            logger.info('Preparing repository');
+            await this.initRepo();
+
+            const indexNoChanges = await this.areFilesEqual(`./${config.process_path}/index.html`, `./${config.github.output_repo}/index.html`);
+            const swNoChanges = await this.areFilesEqual(`./${config.process_path}/sw.js`, `./${config.github.output_repo}/sw.js`);
+
+            logger.debug(
+                {
+                    indexNoChanges: indexNoChanges,
+                    swNoChanges: swNoChanges,
+                },
+                'Completed detecting changes in index.html and sw.js',
+            );
+
+            if (config.exit_if_no_differences === true && indexNoChanges && swNoChanges) {
+                logger.debug('No changed found.');
+                return;
+            }
+
             logger.debug('Downloading preload static assets');
             await this.downloadPreloadAssets();
 
             logger.debug('Donwloading static assets');
             await this.downloadStaticAssets();
-
-            logger.info('Preparing repository');
-            await this.initRepo();
 
             const sourcePath = `./${config.process_path}`;
             const targetPath = `./${config.github.output_repo}`;
@@ -146,7 +162,7 @@ export class WebClientScraper {
         }
     }
 
-    private async areFilesEqual(file1: string, file2: string) {
+    private async areFilesEqual(file1: string, file2: string): Promise<boolean> {
         const content1 = await fs.readFile(file1, 'utf8');
         const content2 = await fs.readFile(file2, 'utf8');
         return content1 === content2;
