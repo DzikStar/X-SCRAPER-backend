@@ -269,12 +269,11 @@ export class ContentResolver {
     }
 
     fixPath(path: string): string {
-        const lastDot = path.lastIndexOf('.');
-
         path = path.replace(/~~/g, '/');
         path = path.replace(/~/g, '/');
         path = path.replace(/_/g, '/');
 
+        const lastDot = path.lastIndexOf('.');
         if (lastDot !== -1) {
             path = path.substring(0, lastDot).replace(/\./g, '/') + path.substring(lastDot);
         } else {
