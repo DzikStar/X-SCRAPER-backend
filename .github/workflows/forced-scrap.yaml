@@ -1,4 +1,4 @@
-name: Launch X-SCRAPER
+name: Force X-SCRAPER
 
 on:
   workflow_dispatch:
