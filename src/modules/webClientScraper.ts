@@ -72,11 +72,15 @@ export class WebClientScraper {
             );
 
             if (config.exit_if_no_differences === true && indexNoChanges && swNoChanges) {
-                logger.debug('No changes found.');
-                return;
+                if (process.env.CONFIG_OVERRIDE__EXIT_IF_NO_DIFFERENCES === 'false') {
+                    logger.debug('Scrap Forced - continuing despite no changes');
+                } else {
+                    logger.debug('No changes found.');
+                    return;
+                }
             }
 
-            // Remove Later (TEMPORARY)
+            //------------------------------[REMOVE LATER - TEMPORARY]------------------------------
             const targetDir = `./${config.github.output_repo}`;
 
             logger.debug({ target: targetDir }, 'Clearing repository path');
@@ -86,6 +90,7 @@ export class WebClientScraper {
                     await fs.rm(join(targetDir, item.name), { recursive: true, force: true });
                 }
             }
+            //-------------------------------------------------------------------------------------
 
             logger.debug('Downloading preload static assets');
             await this.downloadPreloadAssets();
@@ -143,16 +148,19 @@ export class WebClientScraper {
 
     private async downloadStaticAssets(): Promise<void> {
         const swAssets = await this.resolver.getAssetsFromSW();
-        // const indexAssets = await this.resolver.getAssetsFromIndex();
+        const indexAssets = await this.resolver.getAssetsFromIndex();
 
         logger.info(
             {
                 sw: swAssets?.length,
+                index: indexAssets?.length,
             },
             'Found static assets',
         );
 
-        for (const asset of swAssets || []) {
+        const allAssets = [...(swAssets ?? []), ...(indexAssets ?? [])];
+
+        for (const asset of allAssets) {
             let filename = this.resolver.getFilename(asset);
             const path = this.resolver.getPath(asset);
 

@@ -1,0 +1,32 @@
+name: Launch X-SCRAPER
+
+on:
+  workflow_dispatch:
+
+jobs:
+  scrap:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Show environment info
+        run: |
+          node -v
+          npm -v
+          git --version
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 23.6.0
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run scraper
+        run: npm run start
+        env:
+          GH_PERSONAL_ACCESS_TOKEN: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
+          CONFIG_OVERRIDE__EXIT_IF_NO_DIFFERENCES: false
+          

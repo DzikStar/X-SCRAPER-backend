@@ -195,7 +195,7 @@ export class ContentResolver {
             }
             logger.debug('ASSETS array matched in sw.js');
 
-            // Replace apostrophes with quotation marks and trim trailing commas
+            // Replaces apostrophes with quotation marks and trim trailing commas
             const swTableContent = swMatch[1]
                 .replace(/'/g, '"')
                 .replace(/,\s*(\]|$)/g, '$1')
@@ -215,9 +215,44 @@ export class ContentResolver {
         }
     }
 
-    getAssetsFromIndex(): string[] {
-        logger.debug('Extracting static URLs from sw.js');
-        return ['TODO'];
+    async getAssetsFromIndex(): Promise<string[] | undefined> {
+        logger.debug('Starting extraction of static URLs from index.html');
+        // eslint-disable-next-line prefer-const
+        let urls = [];
+
+        try {
+            const indexFilePath = `./${config.process_path}/index.html`;
+
+            logger.debug({ filePath: indexFilePath }, 'Reading HTML file');
+            const indexContent = await fs.readFile(indexFilePath, 'utf-8');
+            logger.debug({ contentLength: indexContent.length }, 'HTML file read successfully');
+
+            const lines = indexContent.split(/\r?\n/);
+
+            const startIndex = lines.findIndex(line => line.includes('"i18n/ar"'));
+            if (startIndex === -1) {
+                throw logger.error('Key "i18n/ar" not found');
+            }
+
+            for (let i = startIndex + 1; i < lines.length; i++) {
+                const line = lines[i].trim();
+
+                const match = line.match(/^"([^"]+)":\s*"([a-zA-Z0-9]{7})",$/);
+                if (match) {
+                    const key = match[1];
+                    const value = match[2];
+                    const url = `${config.domain.abs_twimg}/responsive-web/client-web/${key}.${value}a.js`;
+                    urls.push(url);
+                } else {
+                    break;
+                }
+            }
+
+            return urls;
+        } catch (error) {
+            logger.error({ err: error });
+            throw error;
+        }
     }
 
     getPath(url: string): string {
