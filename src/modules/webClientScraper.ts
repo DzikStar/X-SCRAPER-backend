@@ -150,15 +150,15 @@ export class WebClientScraper {
         const swAssets = await this.resolver.getAssetsFromSW();
         const indexAssets = await this.resolver.getAssetsFromIndex();
 
+        const allAssets = [...new Set([...(swAssets ?? []), ...(indexAssets ?? [])])];
         logger.info(
             {
                 sw: swAssets?.length,
                 index: indexAssets?.length,
+                total: allAssets.length,
             },
             'Found static assets',
         );
-
-        const allAssets = [...(swAssets ?? []), ...(indexAssets ?? [])];
 
         for (const asset of allAssets) {
             let filename = this.resolver.getFilename(asset);

@@ -1,5 +1,5 @@
 {
-    "deploy_on_github": true,
+    "deploy_on_github": false,
     "exit_if_no_differences": true,
     "process_path": "X-SCRAPER-new",
     "github": {
