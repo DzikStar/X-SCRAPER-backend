@@ -233,19 +233,19 @@ export class ContentResolver {
         return pathSegments.join('/');
     }
 
-    fixPath(filename: string): string {
-        const lastDot = filename.lastIndexOf('.');
+    fixPath(path: string): string {
+        const lastDot = path.lastIndexOf('.');
 
-        filename = filename.replace('~~', '/');
-        filename = filename.replace('~', '/');
+        path = path.replace(/~~/g, '/');
+        path = path.replace(/~/g, '/');
 
         if (lastDot !== -1) {
-            filename = filename.substring(0, lastDot).replace(/\./g, '/') + filename.substring(lastDot);
+            path = path.substring(0, lastDot).replace(/\./g, '/') + path.substring(lastDot);
         } else {
-            filename = filename.replace(/\./g, '/');
+            path = path.replace(/\./g, '/');
         }
 
-        return filename;
+        return path;
     }
 
     getFilename(url: string): string {
