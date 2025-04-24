@@ -273,6 +273,7 @@ export class ContentResolver {
 
         path = path.replace(/~~/g, '/');
         path = path.replace(/~/g, '/');
+        path = path.replace(/_/g, '/');
 
         if (lastDot !== -1) {
             path = path.substring(0, lastDot).replace(/\./g, '/') + path.substring(lastDot);
