@@ -76,6 +76,17 @@ export class WebClientScraper {
                 return;
             }
 
+            // Remove Later (TEMPORARY)
+            const targetDir = `./${config.github.output_repo}`;
+
+            logger.debug({ target: targetDir }, 'Clearing repository path');
+            const repoFolder = await fs.readdir(targetDir, { withFileTypes: true });
+            for (const item of repoFolder) {
+                if (item.name !== '.git') {
+                    await fs.rm(join(targetDir, item.name), { recursive: true, force: true });
+                }
+            }
+
             logger.debug('Downloading preload static assets');
             await this.downloadPreloadAssets();
 
