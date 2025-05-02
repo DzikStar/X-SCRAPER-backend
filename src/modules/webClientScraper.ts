@@ -1,4 +1,4 @@
-import { Github } from './github.js';
+import { Github } from '../services/github.js';
 import { ContentResolver } from './contentResolver.js';
 import { config } from '../core/config.js';
 import { getAsset } from '../utils/downloadManager.js';
